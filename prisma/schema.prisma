@@ -1,0 +1,31 @@
+// Prisma schema for Leonari Timepieces
+// Local dev uses SQLite (zero setup). For production deployment (Vercel etc.)
+// switch the datasource below to postgresql and point DATABASE_URL at a
+// hosted Postgres instance (Neon and Supabase both have free tiers) —
+// see README.md "Going to production" section for the exact 3-line change.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Watch {
+  id          String   @id @default(cuid())
+  brand       String
+  model       String
+  reference   String?
+  year        String?
+  condition   String?
+  includes    String?  // e.g. "Watch, Box & Booklets"
+  priceCents  Int      @default(0) // 0 = "Inquire" pricing, like AB Luxe & Co
+  description String?
+  imageUrl    String
+  status      String   @default("IN_STOCK") // IN_STOCK | SOLD
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
