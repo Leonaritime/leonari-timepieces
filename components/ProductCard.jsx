@@ -6,7 +6,7 @@ function formatPrice(cents) {
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 }
 
-export default function ProductCard({ watch }) {
+export default function ProductCard({ watch, index }) {
   const [loading, setLoading] = useState(false);
   const isInquireOnly = !watch.priceCents || watch.priceCents <= 0;
   const isSold = watch.status === "SOLD";
@@ -34,53 +34,63 @@ export default function ProductCard({ watch }) {
   }
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-sm border border-line/60 bg-panel transition hover:border-gold/50">
-      <div className="relative aspect-square overflow-hidden bg-ink">
+    <a href={`/watches/${watch.id}`} className="group block">
+      <div className="relative aspect-[4/5] overflow-hidden bg-panel">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={watch.imageUrl}
           alt={`${watch.brand} ${watch.model}`}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-sm border border-gold/40 bg-ink/80 px-2 py-1 font-body text-[10px] uppercase tracking-widest text-gold">
-          {isSold ? "Sold" : "In Stock"}
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <p className="font-body text-xs uppercase tracking-widest text-gold/80">{watch.brand}</p>
-        <h3 className="mt-1 font-display text-xl text-parchment">{watch.model}</h3>
-        <p className="mt-1 font-body text-xs text-parchment/50">
-          {[watch.reference && `Ref. ${watch.reference}`, watch.year].filter(Boolean).join(" · ")}
-        </p>
-        {watch.includes && (
-          <p className="mt-2 font-body text-xs text-parchment/40">{watch.includes}</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
+        {typeof index === "number" && (
+          <span className="absolute left-4 top-4 font-body text-[10px] uppercase tracking-widest text-ivory/70">
+            Nº {String(index + 1).padStart(2, "0")}
+          </span>
         )}
-        <div className="mt-4 flex flex-1 items-end justify-between gap-3">
-          <p className="font-display text-lg text-parchment">
-            {isInquireOnly ? "Inquire" : formatPrice(watch.priceCents)}
-          </p>
-          {isSold ? (
-            <span className="rounded-sm border border-line px-4 py-2 font-body text-xs uppercase tracking-widest text-parchment/30">
-              Sold
-            </span>
-          ) : isInquireOnly ? (
-            <a
-              href={`mailto:${email}?subject=Inquiry: ${encodeURIComponent(watch.brand + " " + watch.model)}`}
-              className="rounded-sm border border-gold/60 px-4 py-2 font-body text-xs uppercase tracking-widest text-gold transition hover:bg-gold hover:text-ink"
-            >
-              Inquire
-            </a>
-          ) : (
-            <button
-              onClick={handleBuy}
-              disabled={loading}
-              className="rounded-sm bg-gold px-4 py-2 font-body text-xs uppercase tracking-widest text-ink transition hover:bg-goldbright disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Buy Now"}
-            </button>
-          )}
-        </div>
+        {isSold && (
+          <span className="absolute right-4 top-4 border border-ivory/30 px-2 py-1 font-body text-[9px] uppercase tracking-widest text-ivory/60">
+            Sold
+          </span>
+        )}
       </div>
-    </div>
+      <div className="mt-4 flex items-start justify-between gap-4 border-t border-line/60 pt-4">
+        <div>
+          <p className="font-body text-[10px] uppercase tracking-widest text-champagne/80">{watch.brand}</p>
+          <h3 className="mt-1 font-display text-xl text-ivory">{watch.model}</h3>
+          <p className="mt-1 font-body text-[11px] text-steel">
+            {[watch.reference && `Ref. ${watch.reference}`, watch.year].filter(Boolean).join(" · ")}
+          </p>
+        </div>
+        <p className="whitespace-nowrap font-display text-lg text-ivory">
+          {isInquireOnly ? "Inquire" : formatPrice(watch.priceCents)}
+        </p>
+      </div>
+      <div className="mt-3">
+        {isSold ? (
+          <span className="font-body text-[10px] uppercase tracking-widest text-ivory/30">Unavailable</span>
+        ) : isInquireOnly ? (
+          <span
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = `mailto:${email}?subject=Inquiry: ${encodeURIComponent(watch.brand + " " + watch.model)}`;
+            }}
+            className="font-body text-[10px] uppercase tracking-widest text-champagne underline decoration-champagne/40 underline-offset-4 transition hover:text-champagnebright"
+          >
+            Inquire About This Piece
+          </span>
+        ) : (
+          <span
+            onClick={(e) => {
+              e.preventDefault();
+              handleBuy();
+            }}
+            className="font-body text-[10px] uppercase tracking-widest text-champagne underline decoration-champagne/40 underline-offset-4 transition hover:text-champagnebright"
+          >
+            {loading ? "Loading..." : "Acquire This Piece"}
+          </span>
+        )}
+      </div>
+    </a>
   );
 }
