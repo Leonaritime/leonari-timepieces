@@ -1,37 +1,41 @@
+import Reveal from "./Reveal";
+
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-line/60">
+    <section className="relative flex h-screen min-h-[640px] w-full items-end overflow-hidden bg-ink">
+      {/* Cinematic background — swap this URL for your own photography when ready */}
       <div
-        className="absolute inset-0 opacity-40"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 20% 20%, rgba(198,164,92,0.15), transparent 40%), radial-gradient(circle at 80% 70%, rgba(198,164,92,0.12), transparent 45%)"
+            "url('https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=1800&q=80')"
         }}
       />
-      <div className="relative mx-auto flex max-w-6xl flex-col items-center px-6 py-28 text-center">
-        <p className="reveal font-body text-xs uppercase tracking-widest2 text-gold">
-          Ref. No. 001 &mdash; Est. Private Dealer
-        </p>
-        <h1 className="reveal mt-6 max-w-3xl font-display text-5xl leading-tight text-parchment md:text-7xl">
-          Fine watches, <span className="text-shimmer italic">quietly</span> sourced.
-        </h1>
-        <p className="reveal mt-6 max-w-xl font-body text-base text-parchment/60 md:text-lg">
-          Leonari Timepieces connects collectors with hand-selected timepieces — every reference verified before it reaches you.
-        </p>
-        <div className="reveal mt-10 flex flex-col gap-4 sm:flex-row">
+      <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/60 via-transparent to-transparent" />
+
+      <div className="relative z-10 mx-auto w-full max-w-prose2 px-8 pb-24 pt-40">
+        <Reveal>
+          <p className="plate-label">Nº 001 — Private Dealer, Established by Referral</p>
+        </Reveal>
+        <Reveal delay={150}>
+          <h1 className="mt-6 max-w-2xl font-display text-6xl font-light leading-[1.05] text-ivory md:text-7xl">
+            A quieter way<br />to collect <span className="italic text-champagne">fine watches.</span>
+          </h1>
+        </Reveal>
+        <Reveal delay={300}>
+          <p className="mt-6 max-w-md font-body text-sm leading-relaxed text-ivory/70">
+            Every reference sourced, inspected, and delivered by hand — no showroom, no pressure, just the piece you came for.
+          </p>
+        </Reveal>
+        <Reveal delay={450}>
           <a
-            href="#watches"
-            className="rounded-sm bg-gold px-8 py-3 font-body text-sm uppercase tracking-widest text-ink transition hover:bg-goldbright"
+            href="#collection"
+            className="mt-10 inline-block border-b border-champagne pb-1 font-body text-xs uppercase tracking-widest text-champagne transition hover:text-champagnebright hover:border-champagnebright"
           >
-            Shop Watches
+            Enter the Collection →
           </a>
-          <a
-            href="#sell"
-            className="rounded-sm border border-gold/50 px-8 py-3 font-body text-sm uppercase tracking-widest text-gold transition hover:bg-gold/10"
-          >
-            Sell Your Watch
-          </a>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
