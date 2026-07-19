@@ -1,27 +1,62 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap');
 
-export default function SuccessPage() {
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "sales@leonaritime.com";
-  return (
-    <>
-      <Header />
-      <main className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-6 text-center">
-        <p className="font-body text-xs uppercase tracking-widest2 text-gold">Order Confirmed</p>
-        <h1 className="mt-4 font-display text-4xl text-parchment">Thank you for your purchase.</h1>
-        <p className="mt-4 font-body text-sm leading-relaxed text-parchment/60">
-          A confirmation has been sent to your email. We'll be in touch shortly with tracking and insured shipping details.
-          Questions in the meantime? Reach us at{" "}
-          <a href={`mailto:${email}`} className="text-gold hover:underline">{email}</a>.
-        </p>
-        <a
-          href="/"
-          className="mt-8 rounded-sm border border-gold/60 px-6 py-3 font-body text-xs uppercase tracking-widest text-gold hover:bg-gold hover:text-ink"
-        >
-          Back to Collection
-        </a>
-      </main>
-      <Footer />
-    </>
-  );
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0d0e10;
+  color: #f3efe6;
+}
+
+::selection {
+  background-color: #c7a66b;
+  color: #0d0e10;
+}
+
+/* Museum-placard numbering — used consistently as the page's signature device */
+.plate-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #c7a66b;
+}
+
+/* Scroll reveal — driven by the Reveal component adding .is-visible via IntersectionObserver */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Visible keyboard focus, on-brand */
+:focus-visible {
+  outline: 1px solid #c7a66b;
+  outline-offset: 4px;
+}
+
+/* Thin hairline divider used throughout instead of heavy borders */
+.hairline {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #2a2c30 15%, #2a2c30 85%, transparent);
 }
