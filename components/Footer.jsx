@@ -1,3 +1,4 @@
+"use client"; 
 export default function Footer() {
   const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "sales@leonaritime.com";
   const phone = process.env.NEXT_PUBLIC_CONTACT_PHONE || "+1 555 555 5555";
