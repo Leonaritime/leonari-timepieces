@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { addToCart } from "@/lib/cart";
+import { isWishlisted, toggleWishlist } from "@/lib/wishlist";
 
 function formatPrice(cents) {
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -8,9 +10,28 @@ function formatPrice(cents) {
 
 export default function ProductCard({ watch, index }) {
   const [loading, setLoading] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [added, setAdded] = useState(false);
   const isInquireOnly = !watch.priceCents || watch.priceCents <= 0;
   const isSold = watch.status === "SOLD";
   const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "sales@leonaritime.com";
+
+  useEffect(() => {
+    setWishlisted(isWishlisted(watch.id));
+  }, [watch.id]);
+
+  function handleWishlist(e) {
+    e.preventDefault();
+    const nowActive = toggleWishlist(watch);
+    setWishlisted(nowActive);
+  }
+
+  function handleAddToCart(e) {
+    e.preventDefault();
+    addToCart(watch);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  }
 
   async function handleBuy() {
     setLoading(true);
@@ -53,6 +74,26 @@ export default function ProductCard({ watch, index }) {
             Sold
           </span>
         )}
+        {!isSold && (
+          <button
+            type="button"
+            onClick={handleWishlist}
+            aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            className="absolute right-4 top-4 text-ivory transition hover:text-champagne"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill={wishlisted ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className={wishlisted ? "text-champagne" : "text-ivory"}
+            >
+              <path d="M12 21s-7.5-4.6-10-9.1C.6 8.6 2 5 5.6 5c2 0 3.4 1.1 4.4 2.6C11 6.1 12.4 5 14.4 5 18 5 19.4 8.6 22 11.9 19.5 16.4 12 21 12 21z" />
+            </svg>
+          </button>
+        )}
       </div>
       <div className="mt-4 flex items-start justify-between gap-4 border-t border-line/60 pt-4">
         <div>
@@ -66,7 +107,7 @@ export default function ProductCard({ watch, index }) {
           {isInquireOnly ? "Inquire" : formatPrice(watch.priceCents)}
         </p>
       </div>
-      <div className="mt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-4">
         {isSold ? (
           <span className="font-body text-[10px] uppercase tracking-widest text-ivory/30">Unavailable</span>
         ) : isInquireOnly ? (
@@ -80,15 +121,23 @@ export default function ProductCard({ watch, index }) {
             Inquire About This Piece
           </span>
         ) : (
-          <span
-            onClick={(e) => {
-              e.preventDefault();
-              handleBuy();
-            }}
-            className="font-body text-[10px] uppercase tracking-widest text-champagne underline decoration-champagne/40 underline-offset-4 transition hover:text-champagnebright"
-          >
-            {loading ? "Loading..." : "Acquire This Piece"}
-          </span>
+          <>
+            <span
+              onClick={(e) => {
+                e.preventDefault();
+                handleBuy();
+              }}
+              className="font-body text-[10px] uppercase tracking-widest text-champagne underline decoration-champagne/40 underline-offset-4 transition hover:text-champagnebright"
+            >
+              {loading ? "Loading..." : "Acquire This Piece"}
+            </span>
+            <span
+              onClick={handleAddToCart}
+              className="font-body text-[10px] uppercase tracking-widest text-ivory/60 underline decoration-ivory/30 underline-offset-4 transition hover:text-ivory"
+            >
+              {added ? "Added" : "Add to Cart"}
+            </span>
+          </>
         )}
       </div>
     </a>
