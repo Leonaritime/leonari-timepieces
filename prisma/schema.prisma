@@ -24,6 +24,7 @@ model Watch {
   priceCents  Int      @default(0) // 0 = "Inquire" pricing, like AB Luxe & Co
   description String?
   imageUrl    String
+  imageUrls   String[] @default([])
   status      String   @default("IN_STOCK") // IN_STOCK | SOLD
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
