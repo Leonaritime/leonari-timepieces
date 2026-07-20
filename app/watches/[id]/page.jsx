@@ -2,30 +2,97 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ProductCard from "@/components/ProductCard";
+import Reveal from "@/components/Reveal";
+import WatchGallery from "@/components/WatchGallery";
 
 export const dynamic = "force-dynamic";
+
+function formatPrice(cents) {
+  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+}
 
 export default async function WatchPage({ params }) {
   const watch = await prisma.watch.findUnique({ where: { id: params.id } });
   if (!watch) notFound();
 
+  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "sales@leonaritime.com";
+  const isInquireOnly = !watch.priceCents || watch.priceCents <= 0;
+  const isSold = watch.status === "SOLD";
+
+  // Supports the new imageUrls array field (see NOTE below), falling back to
+  // the original single imageUrl so existing watches with only one photo
+  // still work without a data migration.
+  const images = Array.isArray(watch.imageUrls) && watch.imageUrls.length > 0 ? watch.imageUrls : [watch.imageUrl];
+
+  const specs = [
+    { label: "Reference", value: watch.reference || "—" },
+    { label: "Year", value: watch.year || "—" },
+    { label: "Condition", value: watch.condition || "—" },
+    { label: "Included", value: watch.includes || "—" },
+    { label: "Status", value: isSold ? "Sold" : "Available" }
+  ];
+
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-4xl bg-ink px-6 py-16">
-        <a href="/#watches" className="font-body text-xs uppercase tracking-widest text-gold/70 hover:text-gold">
-          &larr; Back to Collection
-        </a>
-        <div className="mt-8 max-w-sm">
-          <ProductCard watch={watch} />
-        </div>
-        {watch.description && (
-          <div className="mt-10 border-t border-line/60 pt-8">
-            <p className="font-body text-xs uppercase tracking-widest text-gold">Details</p>
-            <p className="mt-3 font-body text-sm leading-relaxed text-parchment/70">{watch.description}</p>
+      <main className="bg-ink pt-32">
+        <div className="mx-auto max-w-prose2 px-8">
+          <a href="/#collection" className="font-body text-[10px] uppercase tracking-widest text-champagne/70 hover:text-champagne">
+            ← Back to the Collection
+          </a>
+
+          <div className="mt-10 grid grid-cols-1 gap-16 md:grid-cols-2">
+            <Reveal>
+              <WatchGallery images={images} alt={`${watch.brand} ${watch.model}`} />
+            </Reveal>
+
+            <Reveal delay={150}>
+              <p className="plate-label">{watch.brand}</p>
+              <h1 className="mt-3 font-display text-4xl font-light leading-tight text-ivory md:text-5xl">
+                {watch.model}
+              </h1>
+              <p className="mt-6 font-display text-3xl text-ivory">
+                {isInquireOnly ? "Inquire for Pricing" : formatPrice(watch.priceCents)}
+              </p>
+
+              <div className="mt-10 divide-y divide-line/60 border-y border-line/60">
+                {specs.map((spec) => (
+                  <div key={spec.label} className="flex items-center justify-between py-3">
+                    <span className="font-body text-[10px] uppercase tracking-widest text-steel">{spec.label}</span>
+                    <span className="font-body text-sm text-ivory">{spec.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {watch.description && (
+                <p className="mt-8 font-body text-sm leading-relaxed text-steel">{watch.description}</p>
+              )}
+
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                {isSold ? (
+                  <span className="border border-line px-8 py-3 text-center font-body text-xs uppercase tracking-widest text-ivory/30">
+                    No Longer Available
+                  </span>
+                ) : (
+                  <a
+                    href={`mailto:${email}?subject=${encodeURIComponent("Inquiry: " + watch.brand + " " + watch.model)}`}
+                    className="border border-champagne/60 px-8 py-3 text-center font-body text-xs uppercase tracking-widest text-champagne transition hover:bg-champagne hover:text-ink"
+                  >
+                    Inquire About This Piece
+                  </a>
+                )}
+                <a
+                  href={`mailto:${email}?subject=${encodeURIComponent("Appointment request")}`}
+                  className="border border-line px-8 py-3 text-center font-body text-xs uppercase tracking-widest text-steel transition hover:border-champagne/60 hover:text-champagne"
+                >
+                  Request an Appointment
+                </a>
+              </div>
+            </Reveal>
           </div>
-        )}
+        </div>
+
+        <div className="mt-28" />
       </main>
       <Footer />
     </>
